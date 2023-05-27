@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:note_app/Note.dart';
 import 'package:note_app/edit_note.dart';
+import 'package:note_app/notes_provider.dart';
+import 'package:provider/provider.dart';
 
 class MyHomePage extends StatefulWidget {
   final String title;
@@ -12,22 +14,25 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<String> notes = ["n1", "n2"];
-  List<String> rem = ["r9", "r8"];
-  List<String> dates = ["d1", "d2"];
-
-  // List<Note> rem = [Note("r1", true), Note("r2", true)];
+  // List<Note> notes = [Note("n1", false), Note("n2", false)];
+  // List<Note> rem = [Note("r9", true), Note("r8", true)];
   int selectedIndex = 0;
 
-  Future<void> createNote() async {
+  Future<void> createNote(provider) async {
     Map note = await Navigator.push(
-        context, MaterialPageRoute(builder: (context) => EditNote()));
+        context,
+        MaterialPageRoute(
+            builder: (mContext) => EditNote(notesProvider: provider)));
+    print("Note?");
+    print(note);
     if (note != null) {
       setState(() {
-        if (note["is_reminder"])
-          rem.add(note["value"]);
-        else
-          notes.add(note["value"]);
+        Note newNote = Note(note["value"], note["is_reminder"]);
+        newNote.setDate(note["date"]);
+        // if (newNote.isReminder)
+        //   rem.add(newNote);
+        // else
+        //   notes.add(newNote);
       });
     }
   }
@@ -38,15 +43,19 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: IndexedStack(
-        index: selectedIndex,
-        children: [
-          buildListView(notes, false),
-          buildListView(rem, true),
-        ],
+      body: Consumer<NotesProvider>(
+        builder: (itemContext, notesProvider, child) {
+          return IndexedStack(
+            index: selectedIndex,
+            children: [
+              buildListView(notesProvider.notes),
+              buildListView(notesProvider.rem),
+            ],
+          );
+        },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: createNote,
+        onPressed: () => createNote(context.read<NotesProvider>()),
         tooltip: 'Increment',
         child: Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
@@ -66,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  ListView buildListView(List data, bool isReminder) {
+  ListView buildListView(List<Note> data) {
     return ListView.builder(
         itemCount: data.length,
         itemBuilder: (context, index) {
@@ -75,37 +84,22 @@ class _MyHomePageState extends State<MyHomePage> {
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Text(data[index]),
+                  Text(data[index].text),
+                  Text(data[index].date),
+                  // Visibility(visible: data[index].date.isNotEmpty, child: Text(data[index].date[index]))
                 ],
               ),
             ),
             onTap: () async {
-              final note = await Navigator.push(
+              Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => EditNote(
-                            note: data[index],
-                            isReminder: isReminder,
+                      builder: (mContext) => EditNote(
+                            note: data[index].text,
+                            isReminder: data[index].isReminder,
+                            date: data[index].date,
+                            notesProvider: context.read<NotesProvider>(),
                           )));
-              if (note != null) {
-                setState(() {
-                  print("Note st:$note");
-                  if (isReminder) {
-                    if (note["is_reminder"])
-                      rem[index] = note["value"];
-                    else {
-                      rem.removeAt(index);
-                      notes.add(note["value"]);
-                    }
-                  } else {
-                    if (note["is_reminder"]) {
-                      notes.removeAt(index);
-                      rem.add(note["value"]);
-                    } else
-                      notes[index] = note["value"];
-                  }
-                });
-              }
             },
           );
         });

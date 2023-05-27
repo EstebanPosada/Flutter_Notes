@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:note_app/notes_provider.dart';
 
 class EditNote extends StatefulWidget {
   String note;
   bool isReminder;
   String date;
+  NotesProvider notesProvider;
 
-  EditNote({this.note, this.isReminder = false, this.date = ''}) : super();
+  EditNote(
+      {this.note, this.isReminder = false, this.date = '', this.notesProvider})
+      : super();
 
   @override
   State<StatefulWidget> createState() => _EditNoteState();
@@ -20,6 +24,9 @@ class _EditNoteState extends State<EditNote> {
 
   @override
   Widget build(BuildContext context) {
+
+
+
     textController.text = widget.note ?? '';
     dateController.text = widget.date ?? '';
 
@@ -78,11 +85,11 @@ class _EditNoteState extends State<EditNote> {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text('Seleccione fecha del recordatorio')));
                     } else {
-                      Navigator.pop(context, {
-                        "value": note,
-                        "is_reminder": widget.isReminder,
-                        "date": date
-                      });
+                      if (widget.isReminder)
+                        widget.notesProvider.addReminder(note);
+                      else
+                        widget.notesProvider.addNote(note);
+                      Navigator.pop(context);
                     }
                   },
                   child: Text("Guardar"))

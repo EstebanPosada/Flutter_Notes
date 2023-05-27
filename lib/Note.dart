@@ -9,4 +9,8 @@ class Note {
     this.date = '';
   }
 
+  void setDate(String newDate) {
+    date = newDate;
+  }
+
 }
