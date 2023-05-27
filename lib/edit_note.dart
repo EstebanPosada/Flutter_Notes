@@ -21,7 +21,7 @@ class _EditNoteState extends State<EditNote> {
   @override
   Widget build(BuildContext context) {
     textController.text = widget.note ?? '';
-    textController.text = widget.date ?? '';
+    dateController.text = widget.date ?? '';
 
     switchRem = Switch(
         value: widget.isReminder,
@@ -74,7 +74,7 @@ class _EditNoteState extends State<EditNote> {
                   onPressed: () {
                     final note = textController.text;
                     final date = dateController.text;
-                    if (widget.isReminder && date.isEmpty) {
+                    if ((widget.isReminder && date.isEmpty) || (!widget.isReminder && note.isEmpty)) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text('Seleccione fecha del recordatorio')));
                     } else {

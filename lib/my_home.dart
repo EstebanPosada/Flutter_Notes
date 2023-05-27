@@ -41,8 +41,8 @@ class _MyHomePageState extends State<MyHomePage> {
       body: IndexedStack(
         index: selectedIndex,
         children: [
-          buildListView(notes, false, List.empty()),
-          buildListView(rem, true, dates),
+          buildListView(notes, false),
+          buildListView(rem, true),
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -66,17 +66,16 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  ListView buildListView(List list, bool isReminder, List date) {
+  ListView buildListView(List data, bool isReminder) {
     return ListView.builder(
-        itemCount: list.length,
+        itemCount: data.length,
         itemBuilder: (context, index) {
           return InkWell(
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
                 children: [
-                  Text(list[index]),
-                  Visibility(visible: date.isNotEmpty, child: Text(date[index]))
+                  Text(data[index]),
                 ],
               ),
             ),
@@ -85,11 +84,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => EditNote(
-                            note: list[index],
+                            note: data[index],
                             isReminder: isReminder,
                           )));
               if (note != null) {
                 setState(() {
+                  print("Note st:$note");
                   if (isReminder) {
                     if (note["is_reminder"])
                       rem[index] = note["value"];
