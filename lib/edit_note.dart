@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:note_app/notes_provider.dart';
 
+import 'Note.dart';
+
 class EditNote extends StatefulWidget {
-  String note;
+  int index;
   bool isReminder;
-  String date;
   NotesProvider notesProvider;
 
-  EditNote(
-      {this.note, this.isReminder = false, this.date = '', this.notesProvider})
-      : super();
+  EditNote({this.index, this.isReminder = false, this.notesProvider}) : super();
 
   @override
   State<StatefulWidget> createState() => _EditNoteState();
@@ -24,19 +23,18 @@ class _EditNoteState extends State<EditNote> {
 
   @override
   Widget build(BuildContext context) {
-
-
-
-    textController.text = widget.note ?? '';
-    dateController.text = widget.date ?? '';
+    Note oldNote =
+        widget.notesProvider.getNoteByIndex(widget.index, widget.isReminder);
+    textController.text = oldNote.text ?? '';
+    dateController.text = oldNote.date ?? '';
 
     switchRem = Switch(
         value: widget.isReminder,
         onChanged: (value) {
           setState(() {
-            widget.note = textController.text;
-            widget.isReminder = value;
-            widget.date = dateController.text;
+            oldNote.text = textController.text;
+            oldNote.isReminder = value;
+            oldNote.date = dateController.text;
           });
         });
 
@@ -81,14 +79,23 @@ class _EditNoteState extends State<EditNote> {
                   onPressed: () {
                     final note = textController.text;
                     final date = dateController.text;
-                    if ((widget.isReminder && date.isEmpty) || (!widget.isReminder && note.isEmpty)) {
+                    if ((widget.isReminder && date.isEmpty) ||
+                        (!widget.isReminder && note.isEmpty)) {
                       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                           content: Text('Seleccione fecha del recordatorio')));
                     } else {
-                      if (widget.isReminder)
-                        widget.notesProvider.addReminder(note);
-                      else
-                        widget.notesProvider.addNote(note);
+                      if (widget.index == null) {
+                        if (widget.isReminder)
+                          widget.notesProvider.addReminder(note);
+                        else
+                          widget.notesProvider.addNote(note);
+                      } else {
+                        if (widget.isReminder)
+                          widget.notesProvider
+                              .updateReminder(note, date, widget.index);
+                        else
+                          widget.notesProvider.updateNote(note, widget.index);
+                      }
                       Navigator.pop(context);
                     }
                   },

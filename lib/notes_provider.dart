@@ -15,8 +15,8 @@ class NotesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  updateNote(Note note, int index) {
-    notes[index] = note;
+  updateNote(String note, int index) {
+    notes[index] = Note(note, false);
     notifyListeners();
   }
 
@@ -25,12 +25,18 @@ class NotesProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  updateReminder(Note note, int index) {
-    rem[index] = note;
+  updateReminder(String note, String date, int index) {
+    Note oldNote = Note(note, true);
+    oldNote.setDate(date);
+    rem[index] = oldNote;
     notifyListeners();
   }
 
-  getNoteByIndex(int index, bool isReminder){
-    if(isReminder) return rem[index]; else return notes[index];
+  Note getNoteByIndex(int index, bool isReminder) {
+    if (index == null) return Note("", false);
+    if (isReminder)
+      return rem[index];
+    else
+      return notes[index];
   }
 }

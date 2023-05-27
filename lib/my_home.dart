@@ -83,10 +83,10 @@ class _MyHomePageState extends State<MyHomePage> {
             child: Padding(
               padding: const EdgeInsets.all(8.0),
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(data[index].text),
                   Text(data[index].date),
-                  // Visibility(visible: data[index].date.isNotEmpty, child: Text(data[index].date[index]))
                 ],
               ),
             ),
@@ -95,9 +95,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   context,
                   MaterialPageRoute(
                       builder: (mContext) => EditNote(
-                            note: data[index].text,
+                            index: index,
                             isReminder: data[index].isReminder,
-                            date: data[index].date,
                             notesProvider: context.read<NotesProvider>(),
                           )));
             },
