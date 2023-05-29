@@ -100,6 +100,9 @@ class _MyHomePageState extends State<MyHomePage> {
                             notesProvider: context.read<NotesProvider>(),
                           )));
             },
+            onLongPress: () async {
+              context.read<NotesProvider>().remove(index, data[index].isReminder);
+            },
           );
         });
   }

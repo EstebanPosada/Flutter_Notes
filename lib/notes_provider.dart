@@ -39,4 +39,9 @@ class NotesProvider with ChangeNotifier {
     else
       return notes[index];
   }
+
+  remove(int index, bool isReminder) {
+    if(isReminder) rem.removeAt(index); else notes.removeAt(index);
+    notifyListeners();
+  }
 }
